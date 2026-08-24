@@ -7,8 +7,8 @@ export interface Env {
 
 	// secrets:
 	WEBHOOK_SECRET: string,
-	PUSHOVER_USER_KEY: string,
-	PUSHOVER_APP_TOKEN: string,
+	PUSHOVER_USER_KEY?: string,
+	PUSHOVER_APP_TOKEN?: string,
 }
 
 function maskSecret(secret: string): string {
@@ -29,23 +29,22 @@ type Provider = (
 ) => Promise<Response | undefined>;
 
 const pushover: Provider = async (request, env, ctx, message) => {
-	if (!env.PUSHOVER_USER_KEY)
-		return new Response('Missing environment variable: PUSHOVER_USER_KEY', {status: 500});
-	if (!env.PUSHOVER_APP_TOKEN)
-		return new Response('Missing environment variable: PUSHOVER_APP_TOKEN', {status: 500});
-
-	console.debug('Pushover secrets:', {
-		PUSHOVER_USER_KEY: maskSecret(env.PUSHOVER_USER_KEY),
-		PUSHOVER_APP_TOKEN: maskSecret(env.PUSHOVER_APP_TOKEN),
-	});
-
-	const body: Record<string, unknown> = {
+	const body: Record<string, string | undefined> = {
 		token: env.PUSHOVER_APP_TOKEN,
 		user: env.PUSHOVER_USER_KEY,
 		device: env.PUSHOVER_DEVICE,
 		...message.extra,
 		message: message.text,
 	};
+	if (!body.user)
+		return new Response('Missing Pushover user', {status: 500});
+	if (!body.token)
+		return new Response('Missing Pushover token', {status: 500});
+
+	console.debug('Pushover secrets:', {
+		PUSHOVER_USER_KEY: maskSecret(body.user),
+		PUSHOVER_APP_TOKEN: maskSecret(body.token),
+	});
 
 	const url = env.PUSHOVER_API_URL ?? 'https://api.pushover.net/1/messages.json';
 	console.debug('Pushover API URL:', url);

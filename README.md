@@ -1,18 +1,27 @@
-# cf-notifications to pushover
+# notifier-worker
 
 Forward Cloudflare notifications to pushover with Cloudflare worker.
 
 ## How to use
 
-1. Clone the repo;
-2. Run `pnpm i` in your terminal;
-3. Run `pnpm run deploy` in your terminal;
-4. log in to your pushover, you can find your user key at https://pushover.net/;
-5. Register your app on https://pushover.net/apps/build, you will find your app token;
-7. Go to your Cloudflare dash, and set up environment variables `PUSHOVER_APP_TOKEN` and `PUSHOVER_USER_KEY` (hide is recommended);
-8. If you wish, you can set up environment variables `WEBHOOK_SECRET` (hide is recommended);
-9. Go to your Cloudflare notifications page and add the Webhook. The `URL` is your worker's URL and the optional secret should be the same as `WEBHOOK_SECRET`;
-10. It should work now;
+### Pushover
+
+1. Clone the repo and run `pnpm i`;
+2. Run `pnpm run deploy`;
+3. Log in to https://pushover.net/ and copy your user key;
+4. Register an app at https://pushover.net/apps/build and copy its app token;
+5. In your Cloudflare dashboard, set `PUSHOVER_USER_KEY` and `PUSHOVER_APP_TOKEN` as secrets, or add `user` and `token` query parameters to the Webhook URL. Leave `PROVIDER` unset or set it to `pushover`;
+6. Optionally, set `WEBHOOK_SECRET` as a secret;
+7. Add a Webhook on your Cloudflare notifications page. Use your Worker's URL and, if configured, the same value as `WEBHOOK_SECRET` for the optional secret;
+
+### Bark
+
+1. Clone the repo and run `pnpm i`;
+2. Run `pnpm run deploy`;
+3. Open Bark and copy the device key from its test URL;
+4. In your Cloudflare dashboard, set `PROVIDER` to `bark` and `BARK_API_URL` to `https://api.day.app/<device-key>`;
+5. Optionally, set `WEBHOOK_SECRET` as a secret;
+6. Add a Webhook on your Cloudflare notifications page. Use your Worker's URL and, if configured, the same value as `WEBHOOK_SECRET` for the optional secret;
 
 ### Environment variables
 
@@ -27,8 +36,8 @@ Forward Cloudflare notifications to pushover with Cloudflare worker.
 
 | Variable | Description | Default |
 | --- | --- | --- |
-| `PUSHOVER_USER_KEY` | Pushover user or group key. | Required |
-| `PUSHOVER_APP_TOKEN` | Pushover application API token. | Required |
+| `PUSHOVER_USER_KEY` | Pushover user or group key. | `user` query parameter |
+| `PUSHOVER_APP_TOKEN` | Pushover application API token. | `token` query parameter |
 | `PUSHOVER_DEVICE` | Limits delivery to the named device, or comma-separated devices. | All active devices |
 | `PUSHOVER_API_URL` | Overrides the Pushover API endpoint. | `https://api.pushover.net/1/messages.json` |
 
@@ -40,4 +49,10 @@ Forward Cloudflare notifications to pushover with Cloudflare worker.
 
 ### Many user to one worker
 
-1. You can override it with URL search params;
+Every query parameter on the Worker URL is copied to the selected provider's request body. This lets different Cloudflare Webhooks use different recipients or delivery options without deploying another Worker.
+
+For Pushover, parameters such as `user`, `token`, and `device` override the configured request fields, while fields such as `title`, `priority`, and `sound` pass through to Pushover. `PUSHOVER_USER_KEY` and `PUSHOVER_APP_TOKEN` may be omitted when `user` and `token` are supplied as query parameters. The `message` field always comes from the Cloudflare notification's `text` and cannot be overridden by a query parameter.
+
+For Bark, use `device_key` to select a device and parameters such as `title`, `group`, and `sound` to set notification options. The `body` field always comes from the Cloudflare notification's `text` and cannot be overridden by a query parameter.
+
+Query parameters do not change `PROVIDER`, `PUSHOVER_API_URL`, `BARK_API_URL`, or `WEBHOOK_SECRET`.
