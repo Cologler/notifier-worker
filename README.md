@@ -28,6 +28,7 @@ Forward Cloudflare notifications to pushover with Cloudflare worker.
 | --- | --- | --- |
 | `PUSHOVER_USER_KEY` | Pushover user or group key. | Required |
 | `PUSHOVER_APP_TOKEN` | Pushover application API token. | Required |
+| `PUSHOVER_DEVICE` | Limits delivery to the named device, or comma-separated devices. | All active devices |
 | `PUSHOVER_API_URL` | Overrides the Pushover API endpoint. | `https://api.pushover.net/1/messages.json` |
 
 #### Bark

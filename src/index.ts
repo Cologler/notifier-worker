@@ -1,6 +1,7 @@
 export interface Env {
 	// vars:
 	PUSHOVER_API_URL?: string,
+	PUSHOVER_DEVICE?: string,
 	BARK_API_URL?: string,
 
 	// secrets:
@@ -40,6 +41,7 @@ const pushover: Provider = async (request, env, ctx, message) => {
 	const body: Record<string, unknown> = {
 		token: env.PUSHOVER_APP_TOKEN,
 		user: env.PUSHOVER_USER_KEY,
+		device: env.PUSHOVER_DEVICE,
 		...message.extra,
 		message: message.text,
 	};
