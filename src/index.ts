@@ -3,6 +3,7 @@ export interface Env {
 	PUSHOVER_API_URL?: string,
 	PUSHOVER_DEVICE?: string,
 	BARK_API_URL?: string,
+	PROVIDER?: string,
 
 	// secrets:
 	WEBHOOK_SECRET: string,
@@ -99,6 +100,10 @@ export default {
 			})
 		}
 
+		const providerName = env.PROVIDER ?? 'pushover';
+		if (providerName !== 'pushover' && providerName !== 'bark')
+			return new Response(`Unsupported provider: ${providerName}`, {status: 500});
+
 		const message: MessageContent = {
 			text: (await request.json<{ text: string }>()).text?.trim() ?? '<EMPTY>',
 			extra: {}
@@ -106,7 +111,7 @@ export default {
 		// load from search params
 		new URL(request.url).searchParams.forEach((v, k) => message.extra[k] = v);
 
-		const errorResponse = await providers.pushover(request, env, ctx, message);
+		const errorResponse = await providers[providerName](request, env, ctx, message);
 		if (errorResponse)
 			return errorResponse;
 

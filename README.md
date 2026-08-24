@@ -21,6 +21,7 @@ Forward Cloudflare notifications to pushover with Cloudflare worker.
 | Variable | Description | Default |
 | --- | --- | --- |
 | `WEBHOOK_SECRET` | Validates the `cf-webhook-auth` request header when set. | Authentication disabled |
+| `PROVIDER` | Selects the notification provider: `pushover` or `bark`. | `pushover` |
 
 #### Pushover
 
@@ -36,8 +37,6 @@ Forward Cloudflare notifications to pushover with Cloudflare worker.
 | Variable | Description | Default |
 | --- | --- | --- |
 | `BARK_API_URL` | Overrides the Bark API endpoint for the Bark provider. | `https://api.day.app/push` |
-
-The worker currently uses the Pushover provider by default. Provider selection will be added separately.
 
 ### Many user to one worker
 
