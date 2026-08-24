@@ -100,7 +100,7 @@ export default {
 		}
 
 		const message: MessageContent = {
-			text: (await request.json<{ text: string }>()).text ?? '<EMPTY>',
+			text: (await request.json<{ text: string }>()).text?.trim() ?? '<EMPTY>',
 			extra: {}
 		};
 		// load from search params
