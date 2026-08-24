@@ -8,6 +8,11 @@ export interface Env {
 	PUSHOVER_APP_TOKEN: string,
 }
 
+function maskSecret(secret: string): string {
+	const length = secret.length;
+	return length > 10 ? `${secret.slice(0, 4)}*** (length=${length})` : `*** (length=${length})`;
+}
+
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 
@@ -17,6 +22,16 @@ export default {
 				status: 401
 			})
 		}
+
+		if (!env.PUSHOVER_USER_KEY)
+			return new Response('Missing environment variable: PUSHOVER_USER_KEY', {status: 500});
+		if (!env.PUSHOVER_APP_TOKEN)
+			return new Response('Missing environment variable: PUSHOVER_APP_TOKEN', {status: 500});
+
+		console.debug('Pushover secrets:', {
+			PUSHOVER_USER_KEY: maskSecret(env.PUSHOVER_USER_KEY),
+			PUSHOVER_APP_TOKEN: maskSecret(env.PUSHOVER_APP_TOKEN),
+		});
 
 		let body: any = {
 			token: env.PUSHOVER_APP_TOKEN,
