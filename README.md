@@ -14,6 +14,30 @@ Forward Cloudflare notifications to pushover with Cloudflare worker.
 9. Go to your Cloudflare notifications page and add the Webhook. The `URL` is your worker's URL and the optional secret should be the same as `WEBHOOK_SECRET`;
 10. It should work now;
 
+### Environment variables
+
+#### Shared
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| `WEBHOOK_SECRET` | Validates the `cf-webhook-auth` request header when set. | Authentication disabled |
+
+#### Pushover
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| `PUSHOVER_USER_KEY` | Pushover user or group key. | Required |
+| `PUSHOVER_APP_TOKEN` | Pushover application API token. | Required |
+| `PUSHOVER_API_URL` | Overrides the Pushover API endpoint. | `https://api.pushover.net/1/messages.json` |
+
+#### Bark
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| `BARK_API_URL` | Overrides the Bark API endpoint for the Bark provider. | `https://api.day.app/push` |
+
+The worker currently uses the Pushover provider by default. Provider selection will be added separately.
+
 ### Many user to one worker
 
 1. You can override it with URL search params;
